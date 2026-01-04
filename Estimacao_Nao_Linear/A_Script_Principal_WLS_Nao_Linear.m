@@ -8,7 +8,7 @@ tic;
 clc; close all; clear
 
 % Constantes:
-e=0.00001; %Tolerância 
+e=0.00001; %Tolerância (utilize uma tolerância bem pequena pois, pode acontecer erros.) 
 
 maxinter = 20; %Máximo de Interações
 
