@@ -37,9 +37,6 @@ W = diag(1 ./ (Dp.^2));
 %% Verificação de observabilidade e Medida Critica
 [id_medida_original] = F_Observabilidade(H_t_f, ordem_final,nb);
 
-%teste
-%[id_medida_original] = F_Observabilidade2(H_t_f, ordem_final);
-
 %% Saída em Imagem
 [h] = G_Figure(H_t_f, ordem_final);
                
