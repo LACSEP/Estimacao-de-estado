@@ -1,4 +1,4 @@
-function [rn] = H_Eliminacao_Medidas_teste(rn, nb, medidas, z, Dp, hx, vars, e, maxinter)
+function [rn] = H_Eliminacao_Medidas(rn, nb, medidas, z, Dp, hx, vars, e, maxinter)
 
 rn_novo=rn;
 x0 = [zeros(nb-1, 1); ones(nb, 1)]; 
@@ -18,3 +18,4 @@ while max(abs(rn_novo))>3
     disp('Nenhuma Medida Precisa Ser Mais Eliminada');
  end
 end
+
