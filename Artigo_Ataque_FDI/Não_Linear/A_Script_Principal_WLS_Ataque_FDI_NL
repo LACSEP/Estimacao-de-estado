@@ -1,0 +1,66 @@
+%% Script Principal para o Estimador de Estados Não Linear Generalista (Com Funções)
+tic;
+clc; close all; clear
+% Constantes:
+e=0.000001; %Tolerância 
+maxinter = 30; %Máximo de Interações
+
+%% Dados de Entrada (Colocar Caminho da Pasta)
+Caminho_barras = 'Dados_Barras_14.xlsx';
+
+Caminho_linhas = 'Dados_Ramos_14.xlsx';
+
+Caminho_medidas = 'Medições_14a.xlsx';
+
+%Caminho_barras='D:\Disciplinas 1º Semestre (Mestrado)\2 - Estimação de Estado em Sistemas Elétricos de Potência\Listas de Exercícios\Código_WLS_Não_Linear\3 barras\Dados_Barras_3';
+%Caminho_linhas='D:\Disciplinas 1º Semestre (Mestrado)\2 - Estimação de Estado em Sistemas Elétricos de Potência\Listas de Exercícios\Código_WLS_Não_Linear\3 barras\Dados_Ramos_3';
+%Caminho_medidas='D:\Disciplinas 1º Semestre (Mestrado)\2 - Estimação de Estado em Sistemas Elétricos de Potência\Listas de Exercícios\Código_WLS_Não_Linear\3 barras\Medições_3';
+
+barras = xlsread(Caminho_barras);
+linhas = xlsread(Caminho_linhas);
+medidas = xlsread(Caminho_medidas); 
+
+[nl, nb, de, para, shunt, de_z, para_z, tipo, z, Dp] = I_Leitura_Dados(barras, linhas, medidas);
+
+%% Matriz de ponderação
+W = diag(1 ./ (Dp.^2)); % Vetor de estados ponderado
+
+%% Criação dinâmica das variáveis de estado (Generalizado)
+% Criação com base no número de barras (nb)
+O_simb = sym('O', [nb 1]); % Cria O1, O2, ... On
+V_simb = sym('V', [nb 1]); % Cria V1, V2, ... Vn
+vars = [O_simb(2:end); V_simb];
+
+%% Chute Inicial: ângulos = 0, tensões = 1.0 p.u.
+x0 = [zeros(nb-1, 1); ones(nb, 1)]; 
+O = [0; O_simb(2:end)]; % Define O1 como referência (0 rad)
+V = V_simb;
+
+%% Matriz de Admitância Nodal 
+[G, g, B, b] = B_Matriz_Admitancia_e_Ramos(nb, nl, linhas, de, para, shunt);
+
+%% Equações de Potência do Ramos
+[hx] = C_Equacoes_Potencia_Agrupadas(nb, nl, linhas, de_z, para_z, g, b, G, B, V, O, medidas, tipo);
+
+%% Algoritmo Para a Implementação do Estimador WLS Não Linear
+[x01, hxo, Hxo, Gxo, hx_func, Hx_func] = D_Solve_WLS_Nao_Linear(hx, vars, W, z, x0, e, maxinter, nb);
+
+%% Erro normalizado 
+[rn,r] = E_Erro_Normalizado(z, hxo, W, Hxo, Gxo);
+
+%% Índice UI
+%[UI] = F_Indice_UI(Hxo, W, z);
+[UI, ei, Wi] = G_Indice_UI_estimativa_do_erro_composto(Hxo, W, z, rn, Dp);
+
+%% Ataque FDI - Não Linear
+[x02,rn1, Hxo1, za] = J_Ataque_FDI(x01,hx_func,hx, vars, W, z, x0, e, maxinter, nb);
+
+%[UI2] = F_Indice_UI(Hxo1, W, za);
+[UI2, ei2, Wi2] = G_Indice_UI_estimativa_do_erro_composto(Hxo1, W, za, rn, Dp);
+%% Eliminação de Medidas
+%[rn] = H_Eliminacao_Medidas_teste(rn, nb, medidas, z, Dp, hx, vars, e, maxinter);
+
+%% Plotagem Detalhada: Ângulos, Tensões e Resíduos (Corrigido)
+K_Plot_FDI(x01, x02, rn, rn1, UI, UI2, ei, ei2, nb);
+tempo_total = toc; 
+fprintf('O tempo de simulação foi de %.4f segundos.\n', tempo_total);
