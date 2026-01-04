@@ -58,9 +58,7 @@ V = V_simb;
 %[UI, ei, Wi] = G_Indice_UI_estimativa_do_erro_composto(Hxo, W, z, rn, Dp);
 
 %% Eliminação de Medidas
-[rn] = H_Eliminacao_Medidas_teste(rn, nb, medidas, z, Dp, hx, vars, e, maxinter);
-
-%[rn] = H_Eliminacao_Medidas2_teste(rn, nb, medidas, z, Dp, hx, vars, e, maxinter);
+[rn] = H_Eliminacao_Medidas(rn, nb, medidas, z, Dp, hx, vars, e, maxinter);
 
 %%
 tempo_total = toc; 
