@@ -1,3 +1,8 @@
+% ------------------------------------- %
+% Created by: Joao Pedro Lima Dantas    %
+% email: jpldantas@usp.br               %
+% ------------------------------------- %
+
 %% Código para o Estimador de Estados Linear Generalista
 tic;
 clc; close all; clear
