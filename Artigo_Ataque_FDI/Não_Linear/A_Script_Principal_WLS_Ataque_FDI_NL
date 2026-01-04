@@ -1,3 +1,8 @@
+% ------------------------------------- %
+% Created by: Joao Pedro Lima Dantas    %
+% email: jpldantas@usp.br               %
+% ------------------------------------- %
+
 %% Script Principal para o Estimador de Estados Não Linear Generalista (Com Funções)
 tic;
 clc; close all; clear
